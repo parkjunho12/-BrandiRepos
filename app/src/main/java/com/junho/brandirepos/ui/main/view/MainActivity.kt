@@ -1,6 +1,10 @@
 package com.junho.brandirepos.ui.main.view
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
+import android.widget.SearchView
 import com.google.android.material.navigation.NavigationView
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -11,6 +15,14 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.junho.brandirepos.R
+import com.junho.brandirepos.data.model.main.service.MainService
+import com.junho.brandirepos.ui.main.viewmodel.MainViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity() {
 
@@ -24,23 +36,15 @@ class MainActivity : AppCompatActivity() {
 
     // 액티비티 속성등을 호출
     private fun initStartView() {
-        val toolbar: Toolbar = findViewById(R.id.toolbar)
-        setSupportActionBar(toolbar)
-
-
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
-        val navView: NavigationView = findViewById(R.id.nav_view)
-        val navController = findNavController(R.id.nav_host_fragment)
         appBarConfiguration = AppBarConfiguration(setOf(
             R.id.nav_home
         ), drawerLayout)
-        setupActionBarWithNavController(navController, appBarConfiguration)
-        navView.setupWithNavController(navController)
     }
 
 
     override fun onSupportNavigateUp(): Boolean {
-        val navController = findNavController(R.id.nav_host_fragment)
+        val navController = findNavController(R.id.fragment_container)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 }

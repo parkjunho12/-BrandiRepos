@@ -25,7 +25,7 @@ class MainAdapter(private val context: Context, private val itemList: ArrayList<
     {
         fun onClick(
             view: View,
-            position: Int
+            imgItem: ImageData
         )
     }
 
@@ -42,7 +42,7 @@ class MainAdapter(private val context: Context, private val itemList: ArrayList<
     override fun onBindViewHolder(holder: Holder, position: Int) {
         holder.bind(itemList[position], position)
         if (itemClick != null){
-            holder.itemView.setOnClickListener { v -> itemClick?.onClick(v, position)!! }
+            holder.itemView.setOnClickListener { v -> itemClick?.onClick(v, itemList[position])!! }
         }
     }
 
@@ -52,11 +52,12 @@ class MainAdapter(private val context: Context, private val itemList: ArrayList<
 
             val imageLoader = Coil.imageLoader(itemView.context)
             val request = LoadRequest.Companion.Builder(itemView.context)
-                .data(Uri.parse(image.imageString))
-                .target(img!!)
-                .scale(Scale.FIT)
-                .transformations(RoundedCornersTransformation(25f))
-                .build()
+                    .data(Uri.parse(image.thumbnail_url))
+                    .target(img!!)
+                    .size(width = image.width, height = image.height)
+                    .scale(Scale.FIT)
+                    .transformations(RoundedCornersTransformation(25f))
+                    .build()
             imageLoader.execute(request)
         }
 

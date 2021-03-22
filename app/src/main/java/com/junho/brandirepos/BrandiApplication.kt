@@ -2,6 +2,7 @@ package com.junho.brandirepos
 
 import android.app.Application
 import com.junho.brandirepos.di.networkModule
+import com.junho.brandirepos.di.repositoryModule
 import com.junho.brandirepos.di.viewModelModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidFileProperties
@@ -17,7 +18,7 @@ class BrandiApplication: Application() {
             androidLogger(Level.ERROR)
             androidContext(this@BrandiApplication)
             androidFileProperties()
-            modules(listOf(networkModule, viewModelModule))
+            modules(listOf(networkModule, repositoryModule, viewModelModule))
 
         }
     }
