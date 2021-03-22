@@ -14,8 +14,11 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.fragment.app.commit
+import androidx.fragment.app.replace
 import com.junho.brandirepos.R
 import com.junho.brandirepos.data.model.main.service.MainService
+import com.junho.brandirepos.ui.detail.DetailFragment
 import com.junho.brandirepos.ui.main.viewmodel.MainViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -26,7 +29,6 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var appBarConfiguration: AppBarConfiguration
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,15 +38,11 @@ class MainActivity : AppCompatActivity() {
 
     // 액티비티 속성등을 호출
     private fun initStartView() {
-        val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
-        appBarConfiguration = AppBarConfiguration(setOf(
-            R.id.nav_home
-        ), drawerLayout)
-    }
+        supportFragmentManager.commit {
+            setReorderingAllowed(true)
+            setCustomAnimations(R.anim.fragment_fade_enter, R.anim.fragment_fade_exit)
+            replace<MainFragment>(R.id.fragment_container)
+        }
 
-
-    override fun onSupportNavigateUp(): Boolean {
-        val navController = findNavController(R.id.fragment_container)
-        return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 }

@@ -24,7 +24,8 @@
         </androidx.appcompat.widget.SearchView>
 
     </LinearLayout>
-    <ScrollView
+    <LinearLayout
+        android:orientation="vertical"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="5dp"
         android:layout_marginEnd="5dp"
@@ -35,12 +36,14 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerview_main"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
         <com.mikhaellopez.circularprogressbar.CircularProgressBar
             android:id="@+id/circularProgressBar"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_gravity="center"
+            android:layout_marginBottom="5dp"
             app:cpb_background_progressbar_color="@android:color/transparent"
             app:cpb_background_progressbar_width="5dp"
             app:cpb_progress_direction="to_right"
@@ -48,5 +51,5 @@
             app:cpb_progressbar_width="5dp"
             app:cpb_indeterminate_mode="true"
             app:cpb_round_border="false" />
-    </ScrollView>
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

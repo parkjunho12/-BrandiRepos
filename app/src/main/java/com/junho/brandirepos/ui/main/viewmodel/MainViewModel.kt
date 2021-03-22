@@ -55,8 +55,18 @@ class MainViewModel(private val mainRepository: MainRepository) : ViewModel() {
 
         val rspMainService = Gson().fromJson(jsonObj.toString(), RspMainService::class.java)
 
+        val meta = rspMainService.meta
+
+        if (meta.is_end) {
+            return
+        }
+
         Log.d("response body", rspMainService.toString())
         val documents = rspMainService.documents
+
+        if (documents.isEmpty()) {
+            return
+        }
 
         for (document in documents) {
             val imageData = ImageData(document.collection, document.thumbnail_url, document.image_url, document.width, document.height, document.display_sitename, document.doc_url, document.datetime)
