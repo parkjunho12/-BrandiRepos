@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.ScrollView
+import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
@@ -21,6 +22,7 @@ import coil.transform.RoundedCornersTransformation
 import com.junho.brandirepos.R
 import com.junho.brandirepos.ui.main.adapter.data.ImageData
 import com.junho.brandirepos.ui.main.view.MainFragment
+import com.squareup.picasso.Picasso
 
 class DetailFragment : Fragment() {
     private lateinit var callback: OnBackPressedCallback
@@ -53,7 +55,7 @@ class DetailFragment : Fragment() {
 
 
         setImages(view, imageData)
-
+        setTextViews(view, imageData)
 
         return view
     }
@@ -68,17 +70,38 @@ class DetailFragment : Fragment() {
         callback.remove()
     }
 
+    private fun setTextViews(view: View, imageData: ImageData) {
+        val tvSiteName = view.findViewById<TextView>(R.id.detail_sitename)
+        val tvDateTime = view.findViewById<TextView>(R.id.detail_datetime)
+        if (imageData.display_sitename != "") {
+            tvSiteName.visibility = View.VISIBLE
+            tvSiteName.text = imageData.display_sitename
+        } else {
+            tvSiteName.visibility = View.GONE
+        }
+
+        if (imageData.datetime != "") {
+            tvDateTime.visibility = View.VISIBLE
+            tvDateTime.text = imageData.datetime
+        } else {
+            tvDateTime.visibility = View.GONE
+        }
+
+    }
+
     private fun setImages(view: View , imageData: ImageData) {
         if (imageData.height > imageData.width) {
             view.findViewById<ScrollView>(R.id.scroll_view).visibility = View.VISIBLE
             imageView = view.findViewById(R.id.scroll_img_detail)
+            view.findViewById<ImageView>(R.id.img_detail).visibility = View.GONE
         } else {
             view.findViewById<ScrollView>(R.id.scroll_view).visibility = View.GONE
             imageView = view.findViewById(R.id.img_detail)
+            imageView.visibility = View.VISIBLE
         }
         val imageLoader = Coil.imageLoader(view.context)
         val request = LoadRequest.Companion.Builder(view.context)
-            .data(Uri.parse(imageData.thumbnail_url))
+            .data(Uri.parse(imageData.image_url))
             .target(imageView)
             .size(width = imageData.width, height = imageData.height)
             .build()

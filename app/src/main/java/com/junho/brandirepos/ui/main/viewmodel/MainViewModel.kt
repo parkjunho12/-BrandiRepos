@@ -34,9 +34,15 @@ class MainViewModel(private val mainRepository: MainRepository) : ViewModel() {
     val isToastOn: LiveData<Boolean>
         get() = _isToastOn
 
+    private val _isEnd = MutableLiveData<Boolean>()
+    val isEnd: LiveData<Boolean>
+        get() = _isEnd
 
-    suspend fun deleteImages() {
-        _imageDataList.deleteAllList()
+
+    fun deleteImages() {
+        viewModelScope.launch {
+            _imageDataList.deleteAllList()
+        }
     }
 
 
@@ -51,6 +57,14 @@ class MainViewModel(private val mainRepository: MainRepository) : ViewModel() {
                 }
             }, {
                 Log.d(ContentValues.TAG, "response error, message : ${it.message}")
+                viewModelScope.launch {
+                    _isToastOn.value = true
+                    android.os.Handler(Looper.getMainLooper()).postDelayed(
+                        Runnable {
+                            _isToastOn.value = false
+                        },1000
+                    )
+                }
             })
     }
 
@@ -65,14 +79,11 @@ class MainViewModel(private val mainRepository: MainRepository) : ViewModel() {
 
         val rspMainService = Gson().fromJson(jsonObj.toString(), RspMainService::class.java)
 
-        val meta = rspMainService.meta
 
-        if (meta.is_end) {
-            return
-        }
 
         Log.d("response body", rspMainService.toString())
         val documents = rspMainService.documents
+        val meta = rspMainService.meta
 
         if (documents.isEmpty()) {
             viewModelScope.launch {
@@ -84,12 +95,13 @@ class MainViewModel(private val mainRepository: MainRepository) : ViewModel() {
                 )
             }
             return
-        }
-
-        for (document in documents) {
-            val imageData = ImageData(document.collection, document.thumbnail_url, document.image_url, document.width, document.height, document.display_sitename, document.doc_url, document.datetime)
-            viewModelScope.launch {
-                _imageDataList.addImage(imageData)
+        } else {
+            _isEnd.value = meta.is_end
+            for (document in documents) {
+                val imageData = ImageData(document.collection, document.thumbnail_url, document.image_url, document.width, document.height, document.display_sitename, document.doc_url, document.datetime)
+                viewModelScope.launch {
+                    _imageDataList.addImage(imageData)
+                }
             }
         }
     }

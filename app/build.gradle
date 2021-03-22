@@ -73,6 +73,10 @@ dependencies {
     //coil
     implementation "io.coil-kt:coil:0.11.0"
 
+    //picasso 추가
+    implementation 'com.squareup.picasso:picasso:2.71828'
+    implementation 'jp.wasabeef:picasso-transformations:2.2.1'
+
     // retrofit
     implementation "com.squareup.retrofit2:retrofit:2.8.2"
     implementation "com.squareup.retrofit2:converter-gson:2.8.2"

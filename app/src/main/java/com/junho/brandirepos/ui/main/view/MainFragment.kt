@@ -12,8 +12,6 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
-import androidx.fragment.app.replace
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.junho.brandirepos.R
@@ -23,10 +21,8 @@ import com.junho.brandirepos.ui.main.adapter.MainAdapter
 import com.junho.brandirepos.ui.main.adapter.data.ImageData
 import com.junho.brandirepos.ui.main.viewmodel.MainViewModel
 import com.mikhaellopez.circularprogressbar.CircularProgressBar
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
+import java.util.*
 
 class MainFragment : Fragment() {
 
@@ -38,6 +34,7 @@ class MainFragment : Fragment() {
     lateinit var circlerView: CircularProgressBar
     private var pageCount = 1
     private var queryText = ""
+    private var previousTotal = 0
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
@@ -78,7 +75,6 @@ class MainFragment : Fragment() {
             }
             circlerView.visibility = View.GONE
             mRecyclerView.adapter!!.notifyDataSetChanged()
-            mRecyclerView.addOnScrollListener(scrollListener)
         })
         mainViewModel.isToastOn.observe(viewLifecycleOwner, {
             if (it != null) {
@@ -87,48 +83,58 @@ class MainFragment : Fragment() {
                 }
             }
         })
+
+        mainViewModel.isEnd.observe(viewLifecycleOwner, {
+            if (it != null) {
+                if (it) {
+                    mRecyclerView.removeOnScrollListener(scrollListener)
+                    Toast.makeText(requireContext(), "모든 페이지를 검색 하였습니다.", Toast.LENGTH_LONG).show()
+                } else {
+                    mRecyclerView.addOnScrollListener(scrollListener)
+                }
+            }
+        })
     }
 
     private fun setTextListener(searchView: androidx.appcompat.widget.SearchView) {
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener,
             androidx.appcompat.widget.SearchView.OnQueryTextListener {
-            private var isTexting = false
+            private val textingQueue: Queue<Boolean> = LinkedList()
 
             override fun onQueryTextChange(newText: String): Boolean {
                 Log.d("test", newText)
-                CoroutineScope(Dispatchers.Main).launch {
-                    if (!isTexting) {
-                        isTexting = true
-                        Handler(Looper.getMainLooper()).postDelayed(
-                            Runnable {
-                                CoroutineScope(Dispatchers.Main).launch {
-                                    mainViewModel.deleteImages()
-                                    setScrollListener()
-                                    mRecyclerView.addOnScrollListener(scrollListener)
-                                    pageCount = 1
-                                    queryText = newText
-                                    mainViewModel.getImageData(queryText, MainService.Companion.Sort.ACCURACY, pageCount++)
-
-                                }
-                                isTexting = false
-                            },1000
-                        )
-                    }
-
-                }
+                textingQueue.add(true)
+                Handler(Looper.getMainLooper()).postDelayed(
+                    Runnable {
+                        if (textingQueue.isNotEmpty()) {
+                            textingQueue.poll()
+                        }
+                        if (textingQueue.isEmpty()){
+                            mainViewModel.deleteImages()
+                            mRecyclerView.addOnScrollListener(scrollListener)
+                            pageCount = 1
+                            queryText = newText
+                            previousTotal = 0
+                            mainViewModel.getImageData(
+                                queryText,
+                                MainService.Companion.Sort.ACCURACY,
+                                pageCount++
+                            )
+                        }
+                    },1000
+                )
                 return true
             }
 
             override fun onQueryTextSubmit(query: String): Boolean {
-                CoroutineScope(Dispatchers.Main).launch {
-                    mainViewModel.deleteImages()
-                    setScrollListener()
-                    mRecyclerView.addOnScrollListener(scrollListener)
-                    pageCount = 1
-                    queryText = query
-                    mainViewModel.getImageData(queryText, MainService.Companion.Sort.ACCURACY, pageCount++)
 
-                }
+//                    mainViewModel.deleteImages()
+//                    mRecyclerView.addOnScrollListener(scrollListener)
+//                    pageCount = 1
+//                    queryText = query
+//                    previousTotal = 0
+//                    mainViewModel.getImageData(queryText, MainService.Companion.Sort.ACCURACY, pageCount++)
+
                 return false
             }
 
@@ -140,9 +146,10 @@ class MainFragment : Fragment() {
             private var firstVisibleItem = 0
             private var visibleItemCount = 0
             private var totalItemCount = 0
-            private var previousTotal = 0
             private var loading = true
             private var visibleThreshold = 2
+            private val scrollQueue: Queue<Boolean> = LinkedList()
+
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 if (dy > 0) {
@@ -159,15 +166,24 @@ class MainFragment : Fragment() {
                     if (!loading && (totalItemCount - visibleItemCount)
                         <= (firstVisibleItem + visibleThreshold)) {
                         if (pageCount == 51) {
+                            recyclerView.removeOnScrollListener(scrollListener)
                             Toast.makeText(requireContext(), "모든 페이지를 검색 하였습니다.", Toast.LENGTH_LONG).show()
                             return
                         }
                         // 끝에 도달 했을 때
-                        CoroutineScope(Dispatchers.Main).launch {
-                            circlerView.visibility = View.VISIBLE
-                            recyclerView.removeOnScrollListener(scrollListener)
-                            mainViewModel.getImageData(queryText, MainService.Companion.Sort.ACCURACY, pageCount++)
-                        }
+                        scrollQueue.add(true)
+                        Handler(Looper.getMainLooper()).postDelayed(
+                            Runnable {
+                                if (scrollQueue.isNotEmpty()) {
+                                    scrollQueue.poll()
+                                }
+                                if (scrollQueue.isEmpty()){
+                                    circlerView.visibility = View.VISIBLE
+                                    recyclerView.removeOnScrollListener(scrollListener)
+                                    mainViewModel.getImageData(queryText, MainService.Companion.Sort.ACCURACY, pageCount++)
+                                }
+                            },200
+                        )
                         loading = true
                     }
                 }
