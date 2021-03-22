@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"
+    tools:context=".ui.detail.DetailFragment">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:orientation="horizontal"
+            android:background="@color/purple_200"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <ImageButton
+                android:src="@drawable/ic_baseline_arrow_back_24"
+                android:backgroundTint="@color/purple_200"
+                android:id="@+id/back_button_detail"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"/>
+        </LinearLayout>
+
+        <ImageView
+            android:layout_marginTop="10dp"
+            android:id="@+id/img_detail"
+            android:layout_gravity="center"
+            android:adjustViewBounds="true"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+        <ScrollView
+            android:layout_marginTop="10dp"
+            android:visibility="gone"
+            android:id="@+id/scroll_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+            <ImageView
+                android:layout_gravity="center"
+                android:adjustViewBounds="true"
+                android:id="@+id/scroll_img_detail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+        </ScrollView>
+
+        <TextView
+            android:visibility="gone"
+            android:id="@+id/detail_sitename"
+            android:textSize="14sp"
+            android:textColor="@color/titleColor"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/notoblack"
+            android:includeFontPadding="false" />
+        <TextView
+            android:visibility="gone"
+            android:id="@+id/detail_datetime"
+            android:textSize="14sp"
+            android:textColor="@color/titleColor"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/notobold"
+            android:includeFontPadding="false" />
+    </LinearLayout>
+</FrameLayout>

@@ -6,7 +6,7 @@
     <string name="nav_header_subtitle">ghdlwnsgh12@naver.com</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
-
+    <string name="no_search_result">검색 결과가 없습니다.</string>
     <string name="menu_gallery">Gallery</string>
     <string name="hint">검색</string>
 </resources>

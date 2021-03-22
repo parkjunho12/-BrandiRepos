@@ -8,21 +8,16 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.ScrollView
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
-import androidx.fragment.app.add
 import androidx.fragment.app.commit
-import androidx.fragment.app.replace
 import coil.Coil
 import coil.request.LoadRequest
-import coil.size.Scale
-import coil.transform.RoundedCornersTransformation
 import com.junho.brandirepos.R
 import com.junho.brandirepos.ui.main.adapter.data.ImageData
-import com.junho.brandirepos.ui.main.view.MainFragment
-import com.squareup.picasso.Picasso
 
 class DetailFragment : Fragment() {
     private lateinit var callback: OnBackPressedCallback
@@ -39,6 +34,7 @@ class DetailFragment : Fragment() {
         callback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 parentFragmentManager.commit {
+                    setCustomAnimations(0, R.anim.anim_slide_out_bottom)
                     hide(this@DetailFragment)
                 }
             }
@@ -48,12 +44,17 @@ class DetailFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.detail_fragment, container, false)
+        val view = inflater.inflate(R.layout.fragment_detail, container, false)
         if (arguments != null) {
             imageData = requireArguments().getSerializable("imageData") as ImageData
         }
 
-
+        view.findViewById<ImageButton>(R.id.back_button_detail).setOnClickListener {
+            parentFragmentManager.commit {
+                setCustomAnimations(0, R.anim.anim_slide_out_bottom)
+                hide(this@DetailFragment)
+            }
+        }
         setImages(view, imageData)
         setTextViews(view, imageData)
 

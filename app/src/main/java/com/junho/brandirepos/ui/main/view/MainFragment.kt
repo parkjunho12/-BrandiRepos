@@ -8,12 +8,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.junho.brandirepos.R
 import com.junho.brandirepos.data.model.main.service.MainService
 import com.junho.brandirepos.ui.detail.DetailFragment
@@ -30,6 +32,8 @@ class MainFragment : Fragment() {
     private lateinit var mRecyclerView: RecyclerView
     private lateinit var gridLayoutManager: GridLayoutManager
     private lateinit var mAdapter: MainAdapter
+    private lateinit var tvNoResult: TextView
+    private lateinit var floatingActionButton: FloatingActionButton
     lateinit var scrollListener: RecyclerView.OnScrollListener
     lateinit var circlerView: CircularProgressBar
     private var pageCount = 1
@@ -43,6 +47,7 @@ class MainFragment : Fragment() {
         val root = inflater.inflate(R.layout.fragment_main, container, false)
         initStartView(root)
         initDataBinding()
+        afterDataBinding()
         return root
     }
 
@@ -51,7 +56,8 @@ class MainFragment : Fragment() {
         gridLayoutManager = GridLayoutManager(requireContext(), 3)
         mRecyclerView.layoutManager = gridLayoutManager
         circlerView = view.findViewById(R.id.circularProgressBar)
-
+        tvNoResult = view.findViewById<TextView>(R.id.tv_no_result)
+        floatingActionButton = view.findViewById(R.id.fab_button)
         val searchBar = view.findViewById<androidx.appcompat.widget.SearchView>(R.id.search_bar)
         setTextListener(searchBar)
         setScrollListener()
@@ -65,7 +71,7 @@ class MainFragment : Fragment() {
                 override fun onClick(view: View, imgItem: ImageData) {
                     parentFragmentManager.commit {
                         setReorderingAllowed(true)
-                        setCustomAnimations(R.anim.fragment_fade_enter, R.anim.fragment_fade_exit)
+                        setCustomAnimations(R.anim.anim_slide_in_bottom, 0)
                         val objBundle = Bundle()
                         objBundle.putSerializable("imageData", imgItem)
                         add<DetailFragment>(R.id.fragment_container, "imageData", objBundle)
@@ -79,7 +85,10 @@ class MainFragment : Fragment() {
         mainViewModel.isToastOn.observe(viewLifecycleOwner, {
             if (it != null) {
                 if (it) {
-                    Toast.makeText(requireContext(), "검색 결과가 없습니다.", Toast.LENGTH_LONG).show()
+                    Toast.makeText(requireContext(), getString(R.string.no_search_result), Toast.LENGTH_LONG).show()
+                    tvNoResult.visibility = View.VISIBLE
+                } else {
+                    tvNoResult.visibility = View.GONE
                 }
             }
         })
@@ -94,6 +103,12 @@ class MainFragment : Fragment() {
                 }
             }
         })
+    }
+
+    private fun afterDataBinding() {
+        floatingActionButton.setOnClickListener {
+            view -> mRecyclerView.smoothScrollToPosition(0)
+        }
     }
 
     private fun setTextListener(searchView: androidx.appcompat.widget.SearchView) {
