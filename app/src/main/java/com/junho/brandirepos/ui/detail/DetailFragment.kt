@@ -105,6 +105,7 @@ class DetailFragment : Fragment() {
             .data(Uri.parse(imageData.image_url))
             .target(imageView)
             .size(width = imageData.width, height = imageData.height)
+            .error(R.drawable.not_found)
             .build()
         imageLoader.execute(request)
     }
