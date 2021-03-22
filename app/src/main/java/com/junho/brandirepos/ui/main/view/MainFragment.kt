@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.SearchView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.add
 import androidx.fragment.app.commit
 import androidx.fragment.app.replace
 import androidx.lifecycle.ViewModelProvider
@@ -68,7 +69,9 @@ class MainFragment : Fragment() {
                     parentFragmentManager.commit {
                         setReorderingAllowed(true)
                         setCustomAnimations(R.anim.fragment_fade_enter, R.anim.fragment_fade_exit)
-                        replace<DetailFragment>(R.id.fragment_container)
+                        val objBundle = Bundle()
+                        objBundle.putSerializable("imageData", imgItem)
+                        add<DetailFragment>(R.id.fragment_container, "imageData", objBundle)
                     }
                 }
 
@@ -76,6 +79,13 @@ class MainFragment : Fragment() {
             circlerView.visibility = View.GONE
             mRecyclerView.adapter!!.notifyDataSetChanged()
             mRecyclerView.addOnScrollListener(scrollListener)
+        })
+        mainViewModel.isToastOn.observe(viewLifecycleOwner, {
+            if (it != null) {
+                if (it) {
+                    Toast.makeText(requireContext(), "검색 결과가 없습니다.", Toast.LENGTH_LONG).show()
+                }
+            }
         })
     }
 
@@ -93,6 +103,7 @@ class MainFragment : Fragment() {
                             Runnable {
                                 CoroutineScope(Dispatchers.Main).launch {
                                     mainViewModel.deleteImages()
+                                    setScrollListener()
                                     mRecyclerView.addOnScrollListener(scrollListener)
                                     pageCount = 1
                                     queryText = newText
@@ -111,6 +122,7 @@ class MainFragment : Fragment() {
             override fun onQueryTextSubmit(query: String): Boolean {
                 CoroutineScope(Dispatchers.Main).launch {
                     mainViewModel.deleteImages()
+                    setScrollListener()
                     mRecyclerView.addOnScrollListener(scrollListener)
                     pageCount = 1
                     queryText = query

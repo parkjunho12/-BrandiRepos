@@ -1,6 +1,7 @@
 package com.junho.brandirepos.ui.main.adapter.data
 
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
 data class ImageData(
         val collection : String,
@@ -11,4 +12,4 @@ data class ImageData(
         val display_sitename : String,
         val doc_url : String,
         val datetime : String
-)
+) : Serializable
