@@ -56,6 +56,7 @@ class MainAdapter(private val context: Context, private val itemList: ArrayList<
                     .target(img!!)
                     .size(width = image.width, height = image.height)
                     .scale(Scale.FIT)
+                    .error(R.drawable.not_found)
                     .transformations(RoundedCornersTransformation(25f))
                     .build()
             imageLoader.execute(request)
